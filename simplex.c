@@ -1,29 +1,15 @@
-#include <stdio.h>
-
-struct P {
-	float MaxCoef;	// Coef max, pour determiner colonne
-	float Coef_S;	// Coef s/r, pour determiner ligne
-	float MinCoef; 	// 
-	int numC;	// Num de lq colonne selectionnee
-	int numL;	// Num ligne selectionnee
-	int *pivot;	// Pour noter les pivots
-}par;
-
-
-void AfficheTab(float **tab, int l, int c);
-void Conclue(float **tab, int l, int c);
+#include "simplex.h"
 
 // --- Normalise la ligne ----------------------------------------------
 // 	Diviser tous les coefs de la ligne pivot par le pivot
-void Normal(float **tab, int L, int C)
+void Normal(float **tab, int C)
 {
 	int j;
 	float coef;
 
 	coef =  tab[par.numL][par.numC];
-	for(j=0; j<C; j++) 
-		tab[par.numL][j] /= coef;//par.Coef_S ;
-	
+	for( j=0; j<C; j++) 
+		tab[par.numL][j] /= coef;	
 }
 
 // --- Reduit la matrice --------------------------------------------	
@@ -93,19 +79,19 @@ int ChoixC(float **tab, int l, int c)
 	return par.numC;
 }
 
-main(int argc , char **argv)
+int main(int argc , char **argv)
 {
-	int nbrC, nbrL;
+	int nbrC, nbrL, nbr;
 	int i,j;
 	float **tab;
 
 	FILE *ptr;
 
 	if ( argc < 2 ) 
-		return;
+		exit ( EXIT_FAILURE );
 
 	if ( ( ptr = fopen( argv[1], "r+" ) ) == NULL ) 
-		return;
+		exit ( EXIT_FAILURE );
 
 	// Lit le nombre de collonne et de lignes
 	fscanf(ptr, "%d %d", &nbrL, &nbrC);
@@ -130,7 +116,7 @@ main(int argc , char **argv)
 	printf("\n--- Tableau en entree (%d,%d) : ---------\n", nbrL, nbrC);
 	AfficheTab(tab, nbrL, nbrC);
 
-	for ( int nbr = 0; ; nbr++ )
+	for ( nbr = 0; ; nbr++ )
 	{
 		// Choisit colonne du pivot
 		if ( ChoixC(tab, nbrL, nbrC)  == -1 )
@@ -148,7 +134,7 @@ main(int argc , char **argv)
 
 		// Normalise la ligne pivot
 		par.pivot[par.numC] = par.numL;
-		Normal(tab, nbrL, nbrC);
+		Normal(tab, nbrC);
 		printf("\t(%d)Normalise :  Lig: %d  Col: %d  MinCoef: %.2f  MaxCoef: %.2f  Coef_S: %.2f \n",nbr, par.numL, par.numC, par.MinCoef, par.MaxCoef, par.Coef_S);
 		AfficheTab(tab, nbrL, nbrC);
 
@@ -161,6 +147,8 @@ main(int argc , char **argv)
 	printf("\n--- Conclusion ---------\n");
 	Conclue(tab, nbrL, nbrC);	
 	fclose(ptr);
+
+	exit ( EXIT_SUCCESS );
 }
 
 // --- Affiche une conclusion ---------------------------------------
