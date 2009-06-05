@@ -17,4 +17,5 @@ int  ChoixL(  float **tab, int l, int c);
 int  ChoixC(  float **tab, int l, int c);  
 void AfficheTab( float **tab, int l, int c);
 void Conclue( float **tab, int l, int c);   
+void showHelp( void );
 

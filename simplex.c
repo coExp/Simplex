@@ -87,21 +87,21 @@ int main(int argc , char **argv)
 
 	FILE *ptr;
 
-	if ( argc < 2 ) 
-		exit ( EXIT_FAILURE );
+	if ( argc != 2 ) 
+		showHelp(), exit ( EXIT_FAILURE );
 
 	if ( ( ptr = fopen( argv[1], "r+" ) ) == NULL ) 
-		exit ( EXIT_FAILURE );
+		showHelp(), exit ( EXIT_FAILURE );
 
-	// Lit le nombre de collonne et de lignes
+	// Lit le nombre de colonnes et de lignes
 	fscanf(ptr, "%d %d", &nbrL, &nbrC);
 
-	// Alloue la meme pour les coefs
+	// Alloue la même pour les coefs
 	tab = (float **) malloc( sizeof(float *) * nbrL );
 	for( i = 0; i < nbrL; i++)
 		tab[i] = malloc(sizeof(float) * nbrC);
 
-	// Utile pour lire les resultats : enregistre les pivot
+	// Utile pour lire les résultats : enregistre les pivot
 	par.pivot = (int *) malloc( sizeof(int)* nbrC );
 	for( j = 0; j < nbrC; j++)
 		par.pivot[j] = -1;
@@ -113,7 +113,7 @@ int main(int argc , char **argv)
 			fscanf(ptr, "%f", &tab[i][j] );		
 	}
 	
-	printf("\n--- Tableau en entree (%d,%d) : ---------\n", nbrL, nbrC);
+	printf("\n--- Table (%d,%d) : ---------\n", nbrL, nbrC);
 	AfficheTab(tab, nbrL, nbrC);
 
 	for ( nbr = 0; ; nbr++ )
@@ -121,25 +121,25 @@ int main(int argc , char **argv)
 		// Choisit colonne du pivot
 		if ( ChoixC(tab, nbrL, nbrC)  == -1 )
 		{
-			printf("--- Fin ---------\n"); 
+			printf("--- End ---------\n"); 
 			break;
 		}
 
 		// Choisit ligne du pivot
 		if ( ChoixL(tab, nbrL, nbrC) == -1 )
 		{
-			printf("--- Non Borne ---------\n"); 
+			printf("--- Unbound ---------\n"); 
 			break;	
 		}
 
 		// Normalise la ligne pivot
 		par.pivot[par.numC] = par.numL;
 		Normal(tab, nbrC);
-		printf("\t(%d)Normalise :  Lig: %d  Col: %d  MinCoef: %.2f  MaxCoef: %.2f  Coef_S: %.2f \n",nbr, par.numL, par.numC, par.MinCoef, par.MaxCoef, par.Coef_S);
+		printf("\t(%d)Normalise =>  Row: %d  Col: %d  MinCoef: %.2f  MaxCoef: %.2f  Coef_S: %.2f \n",nbr, par.numL, par.numC, par.MinCoef, par.MaxCoef, par.Coef_S);
 		AfficheTab(tab, nbrL, nbrC);
 
-		// Reduit la matrice 
-		printf("\t(%d)Reduit : \n", nbr);
+		// Réduit la matrice 
+		printf("\t(%d)Reduce: \n", nbr);
 		Reduire(tab, nbrL, nbrC);
 		AfficheTab(tab, nbrL, nbrC);
 	}
@@ -185,4 +185,22 @@ void AfficheTab(float **tab, int l, int c )
 		}
 		printf("\n");
 	}
+}
+
+// --- Show a simple help message -----------------------------------
+void showHelp( void )
+{
+	printf("solving simplex equation\n");
+	printf("Usage: simlex FILE");
+	printf("\n\tExample: Looking for the max of 2.X + Y");
+	printf("\n\t         Under constraints: X - Y <= 3 ");
+	printf("\n\t                            X + 2.Y <= 6");
+	printf("\n\t                            -X + 2.Y <= 2");
+	printf("\n\t         the FILE is:");
+	printf("\n\t            4 6 ");
+	printf("\n\t            1.0  -1.0 1.0 0.0 0.0 3 ");
+	printf("\n\t            1.0  2.0  0.0 1.0  0.0 6");
+	printf("\n\t            -1.0  2.0  0.0 0.0 1.0 2");
+	printf("\n\t            2.0  1.0 0.0 0.0 0.0 0.0");
+	printf("\n");
 }
